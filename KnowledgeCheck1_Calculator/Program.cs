@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,11 @@ namespace KnowledgeCheck1_Calculator
     {
         static void Main(string[] args)
         {
+            calc();
+        }
 
+        static void calc()
+        {
             Console.WriteLine("Hello. Press 1 for addition, 2 for subtraction, 3 for multiplication, and 4 for division");
 
             var input = Console.ReadLine();
@@ -31,6 +36,9 @@ namespace KnowledgeCheck1_Calculator
                     else
                     {
                         Console.WriteLine("One or more of the numbers is not an int");
+                        Console.WriteLine("Would you like to try again? Y/N");
+                        string redo = Console.ReadLine();
+                        Redo(redo);
                     }
                     break;
 
@@ -47,11 +55,29 @@ namespace KnowledgeCheck1_Calculator
                     else
                     {
                         Console.WriteLine("One or more of the numbers is not an int");
+                        Console.WriteLine("Would you like to try again? Y/N");
+                        string redo = Console.ReadLine();
+                        Redo(redo);
                     }
                     break;
 
                 case "3":
-                    // Add code here
+                    Console.WriteLine("Enter 2 integers to multiply");
+                    var multiplyNumber1 = Console.ReadLine();
+                    var multiplyNumber2 = Console.ReadLine();
+
+                    if (int.TryParse(multiplyNumber1, out int multNumOne) && int.TryParse(multiplyNumber2, out int multNumTwo))
+                    {
+                        Console.Write($"{multiplyNumber1} * {multiplyNumber2} = ");
+                        Console.Write(calculator.Multiply(multNumOne, multNumTwo));
+                    }
+                    else
+                    {
+                        Console.WriteLine("One or more of the numbers is not an int");
+                        Console.WriteLine("Would you like to try again? Y/N");
+                        string redo = Console.ReadLine();
+                        Redo(redo);
+                    }
                     break;
 
                 case "4":
@@ -67,8 +93,28 @@ namespace KnowledgeCheck1_Calculator
                     else
                     {
                         Console.WriteLine("One or more of the numbers is not an int");
+                        Console.WriteLine("Would you like to try again? Y/N");
+                        string redo = Console.ReadLine();
+                        Redo(redo);
                     }
                     break;
+                //break;
+
+                default:
+                    Console.WriteLine("Unknown input");
+                    break;
+            }
+        }
+        static void Redo(string redo)
+        {
+            switch (redo)
+            {
+                case "Y" or "y":
+                    Console.WriteLine("Restarting");
+                    calc();
+                    break;
+
+                case "N" or "n":
                     break;
 
                 default:
