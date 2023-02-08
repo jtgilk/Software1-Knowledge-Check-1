@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,99 +14,14 @@ namespace KnowledgeCheck1_Calculator
     {
         static void Main(string[] args)
         {
-            calc();
+            startup();
         }
-
-        static void calc()
+        static void startup()
         {
             Console.WriteLine("Hello. Press 1 for addition, 2 for subtraction, 3 for multiplication, and 4 for division");
 
             var input = Console.ReadLine();
-            var calculator = new Calculator();
-
-            switch (input)
-            {
-                case "1":
-                    Console.WriteLine("Enter 2 integers to add");
-                    var addNumber1 = Console.ReadLine();
-                    var addNumber2 = Console.ReadLine();
-
-                    if (int.TryParse(addNumber1, out int addNumOne) && int.TryParse(addNumber2, out int addNumTwo))
-                    {
-                        Console.Write($"{addNumber1} + {addNumber2} = ");
-                        Console.Write(calculator.Add(addNumOne, addNumTwo));
-                    }
-                    else
-                    {
-                        Console.WriteLine("One or more of the numbers is not an int");
-                        Console.WriteLine("Would you like to try again? Y/N");
-                        string redo = Console.ReadLine();
-                        Redo(redo);
-                    }
-                    break;
-
-                case "2":
-                    Console.WriteLine("Enter 2 integers to subtract");
-                    var subtractNumber1 = Console.ReadLine();
-                    var subtractNumber2 = Console.ReadLine();
-
-                    if (int.TryParse(subtractNumber1, out int subNumOne) && int.TryParse(subtractNumber2, out int subNumTwo))
-                    {
-                        Console.Write($"{subtractNumber1} - {subtractNumber2} = ");
-                        Console.Write(calculator.Subtract(subNumOne, subNumTwo));
-                    }
-                    else
-                    {
-                        Console.WriteLine("One or more of the numbers is not an int");
-                        Console.WriteLine("Would you like to try again? Y/N");
-                        string redo = Console.ReadLine();
-                        Redo(redo);
-                    }
-                    break;
-
-                case "3":
-                    Console.WriteLine("Enter 2 integers to multiply");
-                    var multiplyNumber1 = Console.ReadLine();
-                    var multiplyNumber2 = Console.ReadLine();
-
-                    if (int.TryParse(multiplyNumber1, out int multNumOne) && int.TryParse(multiplyNumber2, out int multNumTwo))
-                    {
-                        Console.Write($"{multiplyNumber1} * {multiplyNumber2} = ");
-                        Console.Write(calculator.Multiply(multNumOne, multNumTwo));
-                    }
-                    else
-                    {
-                        Console.WriteLine("One or more of the numbers is not an int");
-                        Console.WriteLine("Would you like to try again? Y/N");
-                        string redo = Console.ReadLine();
-                        Redo(redo);
-                    }
-                    break;
-
-                case "4":
-                    Console.WriteLine("Enter 2 integers to divide");
-                    var divideNumber1 = Console.ReadLine();
-                    var divideNumber2 = Console.ReadLine();
-
-                    if (double.TryParse(divideNumber1, out double divNumOne) && double.TryParse(divideNumber2, out double divNumTwo))
-                    {
-                        Console.Write($"{divideNumber1} / {divideNumber2} = ");
-                        Console.Write(calculator.Divide(divNumOne, divNumTwo));
-                    }
-                    else
-                    {
-                        Console.WriteLine("One or more of the numbers is not an int");
-                        Console.WriteLine("Would you like to try again? Y/N");
-                        string redo = Console.ReadLine();
-                        Redo(redo);
-                    }
-                    break;
-                //break;
-
-                default:
-                    Console.WriteLine("Unknown input");
-                    break;
-            }
+            calc(input);
         }
         static void Redo(string redo)
         {
@@ -111,16 +29,73 @@ namespace KnowledgeCheck1_Calculator
             {
                 case "Y" or "y":
                     Console.WriteLine("Restarting");
-                    calc();
+                    startup();
                     break;
 
                 case "N" or "n":
                     break;
-
                 default:
                     Console.WriteLine("Unknown input");
                     break;
             }
+        }
+        static void calc(string input)
+        {
+            int type;
+            string calcType;
+            string calcSymbol;
+            if (int.TryParse(input, out type)) ;
+            else
+            {
+                goto End;
+            }
+            switch (type)
+            {
+                case 1:
+                    calcType = "Add";
+                    calcSymbol = "+";
+                    break;
+                case 2:
+                    calcType = "Subtract";
+                    calcSymbol = "-";
+                    break;
+                case 3:
+                    calcType = "Multiply";
+                    calcSymbol = "*";
+                    break;
+                case 4:
+                    calcType = "Divide";
+                    calcSymbol = "/";
+                    break;
+                default: goto End;
+            }
+            //Create and then point to a Calculator obj before searching and invoking the correct method
+            Type typeM = typeof(Calculator);
+            object obj = Activator.CreateInstance(typeM);
+            MethodInfo methodInfo = typeM.GetMethod(calcType);
+            Console.WriteLine("Enter 2 integers to " + calcType);
+            var first = Console.ReadLine();
+            var second = Console.ReadLine();
+            // check input is 2 integers
+            if (int.TryParse(first, out int int1) && int.TryParse(second, out int int2))
+            {
+                Console.Write($"{int1} {calcSymbol} {int2} = ");
+                //Create obj array to use as arguments when invokeing the calculator class found earlier
+                object[] calcValues = new object[] { int1, int2 };
+                Console.WriteLine(methodInfo.Invoke(obj, calcValues));
+                return;
+            }
+            else
+            {
+                Console.WriteLine("One or more of the numbers is not an int");
+                Console.WriteLine("Would you like to try again? Y/N");
+                string redo = Console.ReadLine();
+                Redo(redo);
+                return;
+            }
+        End:
+            Console.WriteLine("Invalid input");
+            return;
         }
     }
 }
